@@ -1,0 +1,198 @@
+-- Script Universal Otimizado para Delta Executor
+local success, err = pcall(function()
+    -- Carrega biblioteca
+    local Rayfield = loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Rayfield/main/source"))()
+    
+    -- Interface
+    local Window = Rayfield:CreateWindow({
+        Name = "Universal Script Hub",
+        Icon = 0,
+        LoadingTitle = "Carregando...",
+        LoadingSubtitle = "Script Universal",
+        Theme = "Dark",
+        ConfigurationSaving = {
+            Enabled = true,
+            FolderName = "UniversalHub",
+            FileName = "Config"
+        }
+    })
+    
+    -- Tabs
+    local ScriptsTab = Window:CreateTab("🛠️ Scripts", 4483362458)
+    local FlingsTab = Window:CreateTab("💨 Flings", 4483362458)
+    local PlayerTab = Window:CreateTab("👤 Player", 4483362458)
+
+    -- SCRIPTS UNIVERSAL
+    ScriptsTab:CreateSection("Scripts Populares")
+    
+    ScriptsTab:CreateButton({
+        Name = "Infinite Yield",
+        Callback = function()
+            loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Infinite-yield-fe-37483"))()
+        end
+    })
+    
+    ScriptsTab:CreateButton({
+        Name = "Emotes/UGC Free",
+        Callback = function()
+            loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Emot-UGC-Free-script-53262"))()
+        end
+    })
+    
+    ScriptsTab:CreateButton({
+        Name = "Fly v3 Universal",
+        Callback = function()
+            loadstring(game:HttpGet("https://pastebin.com/raw/MkGjaBzR"))()
+        end
+    })
+    
+    -- FLINGS
+    FlingsTab:CreateSection("Sistema de Fling")
+    
+    local flingActive = false
+    local flingConnection = nil
+    
+    local function stopFling()
+        if flingConnection then
+            flingConnection:Disconnect()
+            flingConnection = nil
+        end
+        flingActive = false
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.Velocity = Vector3.new(0,0,0)
+                hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
+            end
+        end
+    end
+    
+    local function startFling(mode)
+        stopFling()
+        local player = game.Players.LocalPlayer
+        local char = player.Character
+        if not char then return end
+        
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        local hum = char:FindFirstChild("Humanoid")
+        if not hrp or not hum then return end
+        
+        flingActive = true
+        
+        flingConnection = game:GetService("RunService").Heartbeat:Connect(function()
+            if not flingActive then return end
+            
+            local currentChar = player.Character
+            if currentChar ~= char then
+                stopFling()
+                return
+            end
+            
+            local currentHrp = currentChar:FindFirstChild("HumanoidRootPart")
+            if not currentHrp then
+                stopFling()
+                return
+            end
+            
+            if mode == "mega" then
+                -- Mega Fling
+                currentHrp.Velocity = Vector3.new(0, 500, 0)
+                currentHrp.CFrame = currentHrp.CFrame + currentHrp.CFrame.LookVector * 100
+                currentHrp.AssemblyLinearVelocity = Vector3.new(0, 500, 0) + currentHrp.CFrame.LookVector * 100
+            else
+                -- Walk Fling
+                currentHrp.Velocity = Vector3.new(0, 150, 0)
+                currentHrp.CFrame = currentHrp.CFrame + currentHrp.CFrame.LookVector * 2.5
+            end
+        end)
+    end
+    
+    FlingsTab:CreateToggle({
+        Name = "WalkFling (Moderado)",
+        CurrentValue = false,
+        Callback = function(value)
+            if value then
+                startFling("walk")
+            else
+                stopFling()
+            end
+        end
+    })
+    
+    FlingsTab:CreateToggle({
+        Name = "Mega Fling (Extremo)",
+        CurrentValue = false,
+        Callback = function(value)
+            if value then
+                startFling("mega")
+            else
+                stopFling()
+            end
+        end
+    })
+    
+    FlingsTab:CreateButton({
+        Name = "🛑 Parar Todos Flings",
+        Callback = function()
+            stopFling()
+        end
+    })
+    
+    -- PLAYER
+    PlayerTab:CreateSection("Ajustes do Personagem")
+    
+    PlayerTab:CreateSlider({
+        Name = "Velocidade",
+        Range = {16, 500},
+        Increment = 1,
+        CurrentValue = 16,
+        Callback = function(value)
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                local hum = char:FindFirstChild("Humanoid")
+                if hum then
+                    hum.WalkSpeed = value
+                end
+            end
+        end
+    })
+    
+    PlayerTab:CreateSlider({
+        Name = "Pulo",
+        Range = {50, 500},
+        Increment = 1,
+        CurrentValue = 50,
+        Callback = function(value)
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                local hum = char:FindFirstChild("Humanoid")
+                if hum then
+                    hum.JumpPower = value
+                end
+            end
+        end
+    })
+    
+    -- Reset ao morrer
+    game.Players.LocalPlayer.CharacterAdded:Connect(function()
+        stopFling()
+    end)
+    
+    -- Notificação
+    Rayfield:Notify({
+        Title = "Universal Hub",
+        Content = "Script carregado com sucesso!",
+        Duration = 3
+    })
+end)
+
+-- Se falhar, mostra erro
+if not success then
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Erro",
+        Text = "Falha: " .. tostring(err),
+        Duration = 10
+    })
+    warn("Erro no script: " .. tostring(err))
+end
